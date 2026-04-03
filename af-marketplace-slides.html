@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>US ATLAS Marketplace @ UChicago AF</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #080c14;
+    --card: #0f1625;
+    --card2: #131d2e;
+    --border: #1a2540;
+    --text: #e8f0ff;
+    --secondary: #7a90b8;
+    --accent: #3b82f6;
+    --accent2: #06b6d4;
+    --green: #10b981;
+    --amber: #f59e0b;
+    --purple: #8b5cf6;
+    --red: #ef4444;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .deck { width: 100%; height: 100%; position: relative; }
+
+  .slide {
+    display: none;
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    padding: 56px 72px;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+
+  .slide.active { display: flex; opacity: 1; }
+
+  .slide-inner { max-width: 980px; width: 100%; }
+
+  /* Backgrounds */
+  .bg-glow {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .bg-glow-1 {
+    background: radial-gradient(ellipse at 15% 50%, rgba(59,130,246,0.10) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 20%, rgba(6,182,212,0.08) 0%, transparent 45%);
+  }
+  .bg-glow-2 {
+    background: radial-gradient(ellipse at 50% 30%, rgba(139,92,246,0.08) 0%, transparent 60%);
+  }
+
+  /* Typography */
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+
+  h1 {
+    font-size: 58px;
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 22px;
+  }
+
+  h2 {
+    font-size: 40px;
+    font-weight: 750;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin-bottom: 22px;
+  }
+
+  .lead {
+    font-size: 20px;
+    color: var(--secondary);
+    line-height: 1.6;
+    max-width: 680px;
+  }
+
+  .accent { color: var(--accent); }
+  .accent2 { color: var(--accent2); }
+  .green { color: var(--green); }
+  .amber { color: var(--amber); }
+  .purple { color: var(--purple); }
+
+  /* Card grid */
+  .cards {
+    display: grid;
+    gap: 14px;
+    margin-top: 28px;
+  }
+  .cards.c2 { grid-template-columns: 1fr 1fr; }
+  .cards.c3 { grid-template-columns: 1fr 1fr 1fr; }
+  .cards.c4 { grid-template-columns: repeat(4, 1fr); }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px;
+  }
+  .card.accent-border { border-top: 3px solid var(--accent); }
+  .card.green-border { border-top: 3px solid var(--green); }
+  .card.purple-border { border-top: 3px solid var(--purple); }
+  .card.amber-border { border-top: 3px solid var(--amber); }
+
+  .card-icon { font-size: 28px; margin-bottom: 10px; display: block; }
+  .card-title { font-size: 15px; font-weight: 700; margin-bottom: 7px; }
+  .card-desc { font-size: 13px; color: var(--secondary); line-height: 1.55; }
+
+  /* Stat row */
+  .stats {
+    display: flex;
+    gap: 20px;
+    margin-top: 28px;
+  }
+  .stat {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 16px;
+    text-align: center;
+  }
+  .stat-num {
+    font-size: 52px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+    letter-spacing: -2px;
+  }
+  .stat-lbl {
+    font-size: 13px;
+    color: var(--secondary);
+    margin-top: 8px;
+    line-height: 1.4;
+  }
+
+  /* Steps */
+  .steps {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    margin-top: 28px;
+  }
+  .step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    padding-top: 0;
+  }
+  .step:not(:last-child)::after {
+    content: 'â';
+    position: absolute;
+    right: -13px;
+    top: 18px;
+    font-size: 20px;
+    color: #2a3a5a;
+    z-index: 1;
+  }
+  .step-num {
+    width: 44px;
+    height: 44px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 17px;
+    margin: 0 auto 12px;
+  }
+  .step-title { font-size: 13px; font-weight: 700; margin-bottom: 5px; }
+  .step-desc { font-size: 11px; color: var(--secondary); line-height: 1.45; padding: 0 6px; }
+
+  /* Code block */
+  .code {
+    background: #060a12;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 26px;
+    margin-top: 20px;
+    font-family: 'SFMono-Regular', 'Consolas', 'Liberation Mono', Menlo, monospace;
+    font-size: 14px;
+    line-height: 1.85;
+    position: relative;
+  }
+  .code-label {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #2a3a5a;
+  }
+  .ln { display: block; }
+  .cm { color: #3d5280; }
+  .kw { color: #c792ea; }
+  .str { color: #c3e88d; }
+  .fn { color: #82aaff; }
+  .tp { color: #89ddff; }
+  .nm { color: #f78c6c; }
+  .vr { color: #eeffff; }
+  .pu { color: #89ddff; }
+
+  /* Two-col */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    margin-top: 24px;
+    align-items: start;
+  }
+  .col-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  /* Icon list */
+  .ilist { display: flex; flex-direction: column; gap: 10px; margin-top: 22px; }
+  .iitem {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 18px;
+  }
+  .iitem .ico { font-size: 22px; min-width: 30px; text-align: center; }
+  .iitem .lbl { font-size: 15px; font-weight: 700; }
+  .iitem .dsc { font-size: 12px; color: var(--secondary); margin-top: 2px; line-height: 1.4; }
+
+  /* Tag pills */
+  .tag {
+    display: inline-block;
+    background: rgba(59,130,246,0.12);
+    border: 1px solid rgba(59,130,246,0.25);
+    color: var(--accent);
+    border-radius: 100px;
+    padding: 4px 13px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 7px;
+    margin-bottom: 7px;
+  }
+  .tag.green { background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.25); color: var(--green); }
+  .tag.purple { background: rgba(139,92,246,0.12); border-color: rgba(139,92,246,0.25); color: var(--purple); }
+  .tag.amber { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.25); color: var(--amber); }
+
+  /* Tip/warn boxes */
+  .tip {
+    background: rgba(16,185,129,0.08);
+    border: 1px solid rgba(16,185,129,0.25);
+    border-radius: 10px;
+    padding: 13px 18px;
+    margin-top: 14px;
+    font-size: 14px;
+    color: var(--green);
+    line-height: 1.5;
+  }
+  .warn {
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.25);
+    border-radius: 10px;
+    padding: 13px 18px;
+    margin-top: 14px;
+    font-size: 14px;
+    color: var(--amber);
+    line-height: 1.5;
+  }
+
+  /* Storage bars */
+  .storage-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+  }
+  .storage-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .storage-name { font-size: 15px; font-weight: 700; }
+  .storage-size { font-size: 13px; font-weight: 700; color: var(--accent); }
+  .storage-bar-bg { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .storage-bar { height: 100%; border-radius: 3px; }
+  .storage-desc { font-size: 12px; color: var(--secondary); margin-top: 7px; }
+
+  /* Comparison two panels */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 16px;
+    align-items: stretch;
+    margin-top: 24px;
+  }
+  .cpanel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 20px;
+  }
+  .cpanel-title {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cpanel-item {
+    font-size: 13px;
+    color: var(--secondary);
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    line-height: 1.5;
+  }
+  .cpanel-item:last-child { border-bottom: none; }
+  .vs { display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; color: #2a3a5a; }
+
+  /* Nav */
+  .nav {
+    position: fixed;
+    bottom: 24px;
+    right: 32px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    z-index: 100;
+  }
+  .nav-ctr { font-size: 12px; color: var(--secondary); font-weight: 500; letter-spacing: 1px; }
+  .nav-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover { background: var(--accent); border-color: var(--accent); }
+
+  .progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.35s ease;
+    z-index: 100;
+  }
+
+  /* Slide number badge */
+  .slide-num {
+    position: fixed;
+    top: 22px;
+    right: 32px;
+    font-size: 11px;
+    color: #2a3a5a;
+    font-weight: 600;
+    letter-spacing: 1px;
+    z-index: 100;
+  }
+
+  /* URL chip */
+  .url-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(6,182,212,0.10);
+    border: 1px solid rgba(6,182,212,0.25);
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-family: 'SFMono-Regular', Menlo, monospace;
+    font-size: 13px;
+    color: var(--accent2);
+    margin-top: 10px;
+    display: block;
+    width: fit-content;
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<div class="slide-num" id="slidenum">1 / 13</div>
+
+<div class="deck">
+
+  <!-- SLIDE 1: Title -->
+  <div class="slide active">
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="slide-inner">
+      <div class="eyebrow">UChicago Analysis Facility Â· Getting Started</div>
+      <h1>The US ATLAS<br><span class="accent">Marketplace</span></h1>
+      <p class="lead">AI-assisted workflows for the UChicago Analysis Facility â whether you're on a login server or inside a Jupyter notebook.</p>
+      <div style="margin-top: 36px;">
+        <span class="tag">github.com/usatlas/marketplace</span>
+        <span class="tag green">af.uchicago.edu</span>
+        <span class="tag purple">Claude Code Plugin</span>
+        <span class="tag amber">login.af.uchicago.edu</span>
+      </div>
+      <div style="margin-top: 28px;">
+        <div class="url-chip">ð usatlas.github.io/af-docs</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: What is the Marketplace -->
+  <div class="slide">
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="slide-inner">
+      <div class="eyebrow">What is it?</div>
+      <h2>A <span class="accent">Claude Code plugin</span> built for ATLAS facilities</h2>
+      <p class="lead">The marketplace packages facility-specific knowledge and AI skills so Claude understands your infrastructure â HTCondor, Rucio, ServiceX, Coffea â right out of the box.</p>
+      <div class="cards c3" style="margin-top: 24px;">
+        <div class="card accent-border">
+          <span class="card-icon">ð§ </span>
+          <div class="card-title">Facility-aware AI</div>
+          <div class="card-desc">Claude knows the UChicago AF stack: queues, storage paths, container images, and common workflows.</div>
+        </div>
+        <div class="card green-border">
+          <span class="card-icon">â¡</span>
+          <div class="card-title">Auto-activates</div>
+          <div class="card-desc">The uchicago-af skill loads automatically when you mention the AF, HTCondor, or JupyterLab at UChicago.</div>
+        </div>
+        <div class="card purple-border">
+          <span class="card-icon">ð</span>
+          <div class="card-title">Plugin system</div>
+          <div class="card-desc">Install once from GitHub. BNL and SLAC facility skills are planned â same install, new skills as they ship.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: Installing -->
+  <div class="slide">
+    <div class="slide-inner">
+      <div class="eyebrow">Installation</div>
+      <h2>Two ways to <span class="accent">install</span></h2>
+      <div class="two-col">
+        <div>
+          <div class="col-label">Option A â from GitHub (recommended)</div>
+          <div class="code">
+            <span class="cm code-label">CLAUDE CODE</span>
+            <span class="ln"><span class="cm"># In any Claude Code session</span></span>
+            <span class="ln"><span class="fn">/plugins</span> <span class="vr">marketplace add</span></span>
+            <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">usatlas/marketplace</span></span>
+            <span class="ln">&nbsp;</span>
+            <span class="ln"><span class="cm"># Then install the plugin from</span></span>
+            <span class="ln"><span class="cm"># the marketplace interface</span></span>
+            <span class="ln"><span class="cm"># â select "analysis-facilities"</span></span>
+          </div>
+          <div class="tip" style="margin-top: 12px;">ð¡ This pulls directly from the usatlas GitHub org â always gets the latest skill updates.</div>
+        </div>
+        <div>
+          <div class="col-label">Option B â local clone</div>
+          <div class="code">
+            <span class="cm code-label">BASH + CLAUDE CODE</span>
+            <span class="ln"><span class="cm"># Clone the repo first</span></span>
+            <span class="ln"><span class="tp">git</span> <span class="vr">clone</span></span>
+            <span class="ln">&nbsp;&nbsp;<span class="str">https://github.com/usatlas/marketplace</span></span>
+            <span class="ln">&nbsp;</span>
+            <span class="ln"><span class="cm"># Then point Claude Code at it</span></span>
+            <span class="ln"><span class="fn">/plugins</span> <span class="vr">marketplace add</span></span>
+            <span class="ln">&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">/path/to/marketplace</span></span>
+          </div>
+          <div class="warn" style="margin-top: 12px;">â ï¸ Local installs don't auto-update. Use GitHub install unless you're developing the plugin itself.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: Two entry points -->
+  <div class="slide">
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="slide-inner">
+      <div class="eyebrow">Two entry points</div>
+      <h2>Login server <span class="accent2">or</span> Jupyter notebook</h2>
+      <p class="lead">Same marketplace, different contexts. How you invoke Claude Code depends on where you're working.</p>
+      <div class="compare" style="margin-top: 28px;">
+        <div class="cpanel" style="border-top: 3px solid var(--accent);">
+          <div class="cpanel-title" style="color: var(--accent);">ð¥ï¸ Login Server</div>
+          <div class="cpanel-item"><strong>How:</strong> SSH â <code style="color:var(--accent2); font-size:12px;">login.af.uchicago.edu</code></div>
+          <div class="cpanel-item"><strong>Claude:</strong> Terminal-based Claude Code CLI</div>
+          <div class="cpanel-item"><strong>Good for:</strong> Batch job submission, file management, long-running setup tasks</div>
+          <div class="cpanel-item"><strong>Storage:</strong> Full access to $HOME, $DATA</div>
+          <div class="cpanel-item"><strong>Compute:</strong> Shared login node â submit jobs to HTCondor</div>
+        </div>
+        <div class="vs">|</div>
+        <div class="cpanel" style="border-top: 3px solid var(--green);">
+          <div class="cpanel-title" style="color: var(--green);">ðª Jupyter Notebook</div>
+          <div class="cpanel-item"><strong>How:</strong> af.uchicago.edu â Services â JupyterLab</div>
+          <div class="cpanel-item"><strong>Claude:</strong> Claude Code in the notebook terminal or as a kernel</div>
+          <div class="cpanel-item"><strong>Good for:</strong> Interactive analysis, visualization, prototyping</div>
+          <div class="cpanel-item"><strong>Storage:</strong> Same $HOME, $DATA filesystems</div>
+          <div class="cpanel-item"><strong>Compute:</strong> Dedicated pod: 1â16 CPU, 1â32 GB RAM, up to 7 GPU instances</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: SSH Access -->
+  <div class="slide">
+    <div class="slide-inner">
+      <div class="eyebrow">Login Server</div>
+      <h2>Connecting via <span class="accent">SSH</span></h2>
+      <p class="lead">The login nodes are your command-line gateway to the entire facility stack.</p>
+      <div clas="two-col">
+        <div>
+          <div class="col-label">Quick connect</div>
+          <div class="code">
+            <span class="cm code-label">TERMINAL</span>
+            <span class="ln"><span class="tp">ssh</span> <span class="str">login.af.uchicago.edu</span></span>
+          </div>
+          <div class="col-label" style="margin-top: 20px;">SSH config shortcut (add to ~/.ssh/config)</div>
+          <div class="code">
+            <span class="cm code-label">~/.SSH/CONFIG</span>
+            <span class="ln"><span class="kw">Host</span> <span class="vr">uchicago</span></span>
+            <span class="ln">&nbsp;&nbsp;<span class="kw">HostName</span> <span class="str">login.af.uchicago.edu</span></span>
+            <span class="ln">&nbsp;&nbsp;<span class="kw">User</span>     <span class="nm">&lt;your-username&gt;</span></span>
+            <span class="ln">&nbsp;&nbsp;<span class="kw">ForwardAgent</span> <span class="vr">yes</span></span>
+            <span class="ln">&nbsp;&nbsp;<span class="kw">IdentityFile</span> <span class="str">~/.ssh/id_ed25519</span></span>
+            <span class="ln">&nbsp;</span>
+            <span class="ln"><span class="cm"># Then just: ssh uchicago</span></span>
+          </div>
+        </div>
+        <div>
+          <div class="ilist" style="margin-top: 0;">
+            <div class="iitem">
+              <span class="ico">ð</span>
+              <div>
+                <div class="lbl">SSH key required</div>
+                <div class="dsc">Upload your public key during account signup. Allow ~15 minutes for sync before first login.</div>
+              </div>
+            </div>
+            <div class="iitem">
+              <span class="icl">âï¸</span>
+              <div>
+                <div class="lbl">What's on the login node</div>
+                <div class="dsc">CVMFS, condor_submit, Rucio CLI, HTCondor tools, your $HOME and $DATA directories.</div>
+              </div>
+            </div>
+            <div class="iitem">
+              <span class="icl">ð¤</span>
+              <div>
+                <div class="lbl">Running Claude Code here</div>
+                <div class="dsc">Open a terminal, run <code style="color:var(--accent2);">claude</code> â the marketplace skill auto-loads when you mention the AF.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: Jupyter Launch -->
+  <div class="slide">
+    <div class="slide-inner">
+      <div class="eyebrow">Jupyter Notebook</div>
+      <h2>Launching <span class="green">JupyterLab</span> on the AF</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-title">Log in</div>
+          <div class="step-desc">Go to af.uchicago.edu and sign in with your AF credentials</div>
+        </div>
+        <div class="step">
+          <div class="step-num">Ù]]Û\ÜÏHÝ\]]HÙ\XÙ\ÈY[OÙ]]Û\ÜÏHÝ\Y\ØÈÛXÚÈÙ\XÙ\È8¡¤\]\XÈÜ[H][Ú\ÜOÙ]Ù]]Û\ÜÏHÝ\]Û\ÜÏHÝ\[[HÏÙ]]Û\ÜÏHÝ\]]HÛÛYÝ\OÙ]]Û\ÜÏHÝ\Y\ØÈÙ]ÔKSKÔKY][YH
+\È
+Ì
+K[XÚÈHÛÛZ[\[XYÙOÙ]Ù]]Û\ÜÏHÝ\]Û\ÜÏHÝ\[[HÙ]]Û\ÜÏHÝ\]]HXÚÈ[XYÙOÙ]]Û\ÜÏHÝ\Y\ØÈ[Ü]ÜH
+XÛÛ[Y[Y
+HÜ[[[\Ú\Ð\ÙH[XYÙHÜUTË\ÜXÚYXÈÛÜÏÙ]Ù]]Û\ÜÏHÝ\]Û\ÜÏHÝ\[[HÝ[OHXÚÙÜÝ[\KYÜY[NÈOÙ]]Û\ÜÏHÝ\]]HÜ[\Z[[Ù]]Û\ÜÏHÝ\Y\ØÈ[ÛÙHÝ[OHÛÛÜ\KXXØÙ[NÈÛ\Ú^NL\ÈÛ]YOØÛÙO[H\]\X\Z[[È\ÙHHX\Ù]XÙOÙ]Ù]Ù]]Û\ÜÏHØ\ÈÌÈÝ[OHX\Ú[]ÜÈ]Û\ÜÏHØ\]Û\ÜÏHØ\]]H¼'éè[Ü]ÜOÙ]]Û\ÜÏHØ\Y\ØÈ]ÛËL[ÛÜÝËØÚZÚ][X\ÓÕTÛÛËÕQHLË\ÝÜ[ÜÝ\Ù\ËÙ]Ù]]Û\ÜÏHØ\]Û\ÜÏHØ\]]H¸¦¦ûî#È[[\Ú\Ð\ÙOÙ]]Û\ÜÏHØ\Y\ØÈÝXHUTÈÛÙØ\H[\ÛY[ÜÛÜÈYYÈÜXÚYXÈUTÈ[X\ÙH\Ú[ÛËÙ]Ù]]Û\ÜÏHØ\]Û\ÜÏHØ\]]H¼'ã«ÔH[Ý[Ù\ÏÙ]]Û\ÜÏHØ\Y\ØÈ\È
+È[Ý[Ù\ÈÛH
+0åÐLLÔ\Ë\]Y\ÝÛHÚ][ÝHYY8 %Ú\Y\ÛÝ\ÙKÙ]Ù]Ù]Ù]Ù]KKHÓQH
+ÎX\Ù]XÙH[\]\KO]Û\ÜÏHÛYH]Û\ÜÏHÛYKZ[\]Û\ÜÏH^YXÝÈ[ÚYHHÝXÛÚÏÙ]\Ú[ÈHX\Ù]XÙHÜ[Û\ÜÏHXØÙ[ÛH\]\ÜÜ[ÚÛ\ÜÏHXYÛ]YHÛÙH[È[H\]\X\Z[[HXÚXØYÛËXYÚÚ[ÛÝÜÈ[Ý\ÝXÛÚÉÜÈÛÛZ[\ÛÛ^Ü]Û\ÜÏHÛËXÛÛ]]Û\ÜÏHÛÛ[X[[H\]\X\Z[[Ù]]Û\ÜÏHÛÙHÜ[Û\ÜÏHÛHÛÙK[X[TUTPTRSSÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÛHÈÝ\Û]YHÛÙOÜÜ[ÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÛ]YOÜÜ[ÜÜ[Ü[Û\ÜÏHÜÏÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÛHÈÛ]YH]]Ë[ØYÈXÚXØYÛËXYÚÚ[ÜÜ[ÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÛHÈ^[\HÛ\ÎÜÜ[ÜÜ[Ü[Û\ÜÏHÜÏÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÝÝÈÈH[Ý[H]ÈXÚØYÙOÜÜ[ÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÝÜÝÚ]^H[\ÈÝXÛÚÏÈÜÜ[ÜÜ[Ü[Û\ÜÏHÜÏÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÝ[YHÙ]\HÙ\XÙV]Y\OÜÜ[ÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÝÜÙÜ^H\H]\Ù]ÜÜ[ÜÜ[Ü[Û\ÜÏHÜÏÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÝÚ]	ÜÈ^H	UH][ÝH[ÝÏÜÜ[ÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÝÜÛ]XÚ]HH\ÙYÈÜÜ[ÜÜ[Ù]Ù]]]Û\ÜÏH[\ÝÝ[OHX\Ú[]ÜÈ]Û\ÜÏHZ][HÜ[Û\ÜÏHXÛÈ¼'äéÜÜ[]]Û\ÜÏH^HÜXÚØYÙ\ÏÙ]]Û\ÜÏHØÈHQ\Ù\È^H
+ÝÛÛKÜ\
+HÜ[\ÛY[X[YÙ[Y[HÚÚ[ÛÝÜÈHYÚÛÛ[X[ËÙ]Ù]Ù]]Û\ÜÏHZ][HÜ[Û\ÜÏHXÛÈ¼'ä¯ÜÜ[]]Û\ÜÏHØ[YH[\Þ\Ý[\ÏÙ]]Û\ÜÏHØÈ[Ý\ÝXÛÚÈÙY\ÈHØ[YH	ÓQH[	UH\ÈHÙÚ[ÙK[\È\Ú\ÝXÜÜÜÈÙ\ÜÚ[ÛËÙ]Ù]Ù]]Û\ÜÏHZ][HÜ[Û\ÜÏHXÛÈ¸£ìÜÜ[]]Û\ÜÏHÌZÝ\[Z]Ù]]Û\ÜÏHØÈ\]\XÙ\ÜÚ[ÛÈ^\KØ]HÛÜÈÈ	UKÝ\ÝÝXÛÚÈÝ]H8 %]ÛÛÝÝ\]HH\Ý\Ù]Ù]Ù]]Û\ÜÏHZ][HÜ[Û\ÜÏHXÛÈ¼'å%ÏÜÜ[]]Û\ÜÏHÛÙXH
+È\ÚÏÙ]]Û\ÜÏHØÈHÚÚ[Ø[[[ÝHÜ[\HÛÙXHØ\ØHÛ\Ý\ÛHÚ][[Ý\ÝXÛÚÈÜ\ÝX]Y[[\Ú\ËÙ]Ù]Ù]Ù]Ù]Ù]Ù]Ù]KKHÓQHÝÜYÙHKO]Û\ÜÏHÛYH]Û\ÜÏHÛYKZ[\]Û\ÜÏH^YXÝÈÝÜYÙOÙ]YH[\Þ\Ý[\È8 %Ü[Û\ÜÏHXØÙ[\ÙHHYÚÛOÜÜ[ÚÛ\ÜÏHXYÝÜYÙH\ÈÚ\YÚÛÜÚ[ÈÛÜXÝH][ÈÜÝ]H[ÙÚ[Ø[\ËÜ]Ý[OHX\Ú[]ÜÈ]Û\ÜÏHÝÜYÙKZ][H]Û\ÜÏHÝÜYÙKZXY\Ü[Û\ÜÏHÝÜYÙK[[YH¼'ãè	ÓQHÛÙHÝ[OHÛ\Ú^NLÈÛÛÜ\K\ÙXÛÛ\JNÈÚÛYKÉTÑTØÛÙOÜÜ[Ü[Û\ÜÏHÝÜYÙK\Ú^HLÐÜÜ[Ù]]Û\ÜÏHÝÜYÙKX\XÈ]Û\ÜÏHÝÜYÙKX\Ý[OHÚY	NÈXÚÙÜÝ[\KXXØÙ[
+NÈÙ]Ù]]Û\ÜÏHÝÜYÙKY\ØÈÜÛÙKØÜ\ËÝXZ][\Ë[ÛX[Ø[\\ËÝÛÈÝ[OHÛÛÜ\K]^
+NÈXÚÙY\ÙYZÛKÜÝÛÏY[ÝH[\Ë[ÝHØ[ÝÙÈ[8 %[Û]ÜÚ]ÛÙHÝ[OHÛÛÜ\KXXØÙ[NÈH\ÚØÛÙOÙ]Ù]]Û\ÜÏHÝÜYÙKZ][H]Û\ÜÏHÝÜYÙKZXY\Ü[Û\ÜÏHÝÜYÙK[[YH¼'ä¯	UHÛÙHÝ[OHÛ\Ú^NLÈÛÛÜ\K\ÙXÛÛ\JNÈÙ]KÉTÑTØÛÙOÜÜ[Ü[Û\ÜÏHÝÜYÙK\Ú^HHÜÜ[Ù]]Û\ÜÏHÝÜYÙKX\XÈ]Û\ÜÏHÝÜYÙKX\Ý[OHÚYÌ	NÈXÚÙÜÝ[\KYÜY[NÈÙ]Ù]]Û\ÜÏHÝÜYÙKY\ØÈÜÓÕ[\Ë\\Ë[\ÙH]\Ù]ËÝÛÈÝ[OHÛÛÜ\K]^
+NÈÝXÚÙY\ÜÝÛÏÚ\YXÜÜÜÈ[ÛÜÙ\Ù\È8 %YX[Ü]ÚØ[]ÛÝ]]Ù]Ù]]Û\ÜÏHÝÜYÙKZ][H]Û\ÜÏHÝÜYÙKZXY\Ü[Û\ÜÏHÝÜYÙK[[YH¸¦¨H	ÐÔUÒÛÙHÝ[OHÛ\Ú^NLÈÛÛÜ\K\ÙXÛÛ\JNÈØØ[ÈÛÜÙ\ÙOØÛÙOÜÜ[Ü[Û\ÜÏHÝÜYÙK\Ú^H\[Y\[ÜÜ[Ù]]Û\ÜÏHÝÜYÙKX\XÈ]Û\ÜÏHÝÜYÙKX\Ý[OHÚYMINÈXÚÙÜÝ[\KX[X\NÈÙ]Ù]]Û\ÜÏHÝÜYÙKY\ØÈ\Ý\ÝKÓÈÜØÈ[YÚÝÛÈÝ[OHÛÛÜ\KX[X\NÈÚ\YÚ[[Ý\Ø[ËÜÝÛÏÛÜH[]ÈÛH	UH8¡¤	ÐÔUÒ]ØÝ\ÈÛÜHÝ]]ÈXÚÈYÜHØ[\Ú\ËÙ]Ù]Ù]]Û\ÜÏH\¼'ä¨H[ÛÈ]Z[XNÐÐSÔÕTTÒÈXHXÚ[È8 %MHY][ÜÚ\[È]\Ù]ÈXÜÜÜÈTËPUTÈÛÛXÜ][ÛÙ]Ù]Ù]KKHÓQHNÛÛÜKO]Û\ÜÏHÛYH]Û\ÜÏHÛYKZ[\]Û\ÜÏH^YXÝÈ]ÚØÏÙ]ÛÛÜÛHÜ[Û\ÜÏHXØÙ[ÙÚ[Ù\\ÜÜ[Ú]Û\ÜÏHÛËXÛÛ]]Û\ÜÏHÛÛ[X[Z[[X[ÝXZ][OÙ]]Û\ÜÏHÛÙHÜ[Û\ÜÏHÛHÛÙK[X[VRÐÕPÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÝÈ^XÝ]XOÜÜ[Ü[Û\ÜÏHHOÜÜ[Ü[Û\ÜÏHÝ[Ø[[\Ú\ËÚÜÜ[ÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÝÈÝ]]ÜÜ[Ü[Û\ÜÏHHOÜÜ[Ü[Û\ÜÏHÝØÉ
+Û\Ý\Y
+KÝ]ÜÜ[ÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÝÈ\ÜÜÜ[Ü[Û\ÜÏHHOÜÜ[Ü[Û\ÜÏHÝØÉ
+Û\Ý\Y
+K\ÜÜ[ÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÝÈÙÏÜÜ[Ü[Û\ÜÏHHOÜÜ[Ü[Û\ÜÏHÝØÙÏÜÜ[ÜÜ[Ü[Û\ÜÏHÜÏÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÝÈ\]Y\ÝØÜ\ÏÜÜ[Ü[Û\ÜÏHHOÜÜ[Ü[Û\ÜÏHHÜÜ[ÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÝÈ\]Y\ÝÛY[[ÜOÜÜ[Ü[Û\ÜÏHHOÜÜ[Ü[Û\ÜÏHÝÐÜÜ[ÜÜ[Ü[Û\ÜÏHÜÏÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÛHÈ\ÙHÚÜ]Y]YHÜØÈ	È
+ÏÜÜ[ÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÝÈÜ]Y]YOÜÜ[Ü[Û\ÜÏHHOÜÜ[Ü[Û\ÜÏHÝÚÜÜÜ[ÜÜ[Ü[Û\ÜÏHÜÏÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÛHÈÜUTÈ]HXØÙ\ÜÎÜÜ[ÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÝÈ\ÙWÞ
+L]\Ù\ÞOÜÜ[Ü[Û\ÜÏHHOÜÜ[Ü[Û\ÜÏHYOÜÜ[ÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÝÈ
+L]\Ù\ÞOÜÜ[Ü[Û\ÜÏHHOÜÜ[Ü[Û\ÜÏHÝÚÛYKÉ
+TÑTKÞ
+L\ÞOÜÜ[ÜÜ[Ü[Û\ÜÏHÜÏÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÝÈ]Y]YOÜÜ[ÜÜ[Ù]Ù]]]Û\ÜÏHÛÛ[X[Ù^HÛÛ[X[ÏÙ]]Û\ÜÏH[\ÝÝ[OHX\Ú[]ÜÈ]Û\ÜÏHZ][HÜ[Û\ÜÏHXÛÈ¼'äéÜÜ[]]Û\ÜÏHÛÙHÝ[OHÛÛÜ\KXXØÙ[NÈÛÛÜÜÝXZ]^ZØÝXØÛÙOÙ]]Û\ÜÏHØÈ]Y]YH[Ý\Ø]\ÈÛ\Ý\QÜXÚÚ[ËÙ]Ù]Ù]]Û\ÜÏHZ][HÜ[Û\ÜÏHXÛÈ¼'ä`{î#ÏÜÜ[]]Û\ÜÏHÛÙHÝ[OHÛÛÜ\KXXØÙ[NÈÛÛÜÜOØÛÙOÙ]]Û\ÜÏHØÈÙYH[Ý\]Y]YY[[[ÈØÈÚ]Ý]\ËÙ]Ù]Ù]]Û\ÜÏHZ][HÜ[Û\ÜÏHXÛÈ¼'å#OÜÜ[]]Û\ÜÏHÛÙHÝ[OHÛÛÜ\KXXØÙ[NÈÛÛÜÜHX[[^OØÛÙOÙ]]Û\ÜÏHØÈXYÛÜÙHÚHHØ\ÛÝ[[ÈY]Ù]Ù]Ù]]Û\ÜÏHZ][HÜ[Û\ÜÏHXÛÈ¸£î;î#ÏÜÜ[]]Û\ÜÏHÛÙHÝ[OHÛÛÜ\KXXØÙ[NÈÛÛÜÚÛÈÛÛÜÜ[X\ÙOØÛÙOÙ]]Û\ÜÏHØÈ]\ÙH[\Ý[YHØË\ÙY[Ü^[ÈÝXZ]\ÜËÙ]Ù]Ù]Ù]]Û\ÜÏHØ\¸¦¨;î#ÈÚÜ]Y]YH
+	ÍÊH\È\ÜÙ[X[ÜZ\\ÛÝ\ÙH\ÙKHX\Ù]XÙHÚ[[Z[[ÝKÙ]Ù]Ù]Ù]Ù]KKHÓQHLÙ\XÙ\ÈÈÛÛÈKO]Û\ÜÏHÛYH]Û\ÜÏHÛYKZ[\]Û\ÜÏH^YXÝÈQÙ\XÙ\ÏÙ]Ú]HÚÚ[ÛÝÜÈXÝ]Ü[Û\ÜÏHXØÙ[PÚXØYÛÈQÜÜ[Ú]Û\ÜÏHØ\ÈÌÈ]Û\ÜÏHØ\XØÙ[XÜ\Ü[Û\ÜÏHØ\ZXÛÛ¼'æ ÜÜ[]Û\ÜÏHØ\]]HÙ\XÙVÙ]]Û\ÜÏHØ\Y\ØÈ[]\ÛHH[Ú\È[ÝHYYÛH[[ÝHUTÈ]\Ù]È8 %\ÛÝ[SÑÜX]ËÈ[\HÝÛØY\]Z\YÙ]Ù]]Û\ÜÏHØ\XØÙ[XÜ\Ü[Û\ÜÏHØ\ZXÛÛ¸¦%OÜÜ[]Û\ÜÏHØ\]]HÛÙXHØ\ØOÙ]]Û\ÜÏHØ\Y\ØÈ\ÝX]YÛÛ[[\[[\Ú\ÈXH\ÚÈÛÜÙ\ËØØ[HÛHHÚ[ÛHÝXÛÚÈÈÛ\Ý\]ÚYHØÙ\ÜÚ[ÈÚ]ÛHÛÛYÈÚ[ÙKÙ]Ù]]Û\ÜÏHØ\XØÙ[XÜ\Ü[Û\ÜÏHØ\ZXÛÛ¸¦¨OÜÜ[]Û\ÜÏHØ\]]HØXÚOÙ]]Û\ÜÏHØ\Y\ØÈ[Ü\[ØØ[ØXÚ[ÈÙUTÈ]HÛHHÜY\X]YXØÙ\ÜÈÈHØ[YH[\È\È[X]XØ[H\Ý\Ù]Ù]]Û\ÜÏHØ\ÜY[XÜ\Ü[Û\ÜÏHØ\ZXÛÛ¼'åá;î#ÏÜÜ[]Û\ÜÏHØ\]]HXÚ[ÏÙ]]Û\ÜÏHØ\Y\ØÈUTÈ]HX[YÙ[Y[Þ\Ý[K[\XØ]K[ÝÛØY[HUTÈ]\Ù]H]\Ù][YH
+ÓHÈ	UKÙ]Ù]]Û\ÜÏHØ\ÜY[XÜ\Ü[Û\ÜÏHØ\ZXÛÛ¼'ã$ÜÜ[]Û\ÜÏHØ\]]HÑTSÔÏÙ]]Û\ÜÏHØ\Y\ØÈ\XÝXØÙ\ÜÈÈÑTSÔÈÝÜYÙHÜ]\Ù]ÈÝ\XØ]YÈPÚXØYÛÈY]YYÈH[YÓTÈÞKÙ]Ù]]Û\ÜÏHØ\\KXÜ\Ü[Û\ÜÏHØ\ZXÛÛ¼'é%ÜÜ[]Û\ÜÏHØ\]]H]ÛXTÏÙ]]Û\ÜÏHØ\Y\ØÈ[\[ÙKX\ËXKTÙ\XÙHÜS[Ù[Ë\ÞH[Ý\Z[Y[Ù[È]ÛÜÛY[X[ØÛÜ[È]ØØ[KÙ]Ù]Ù]Ù]Ù]KKHÓQHLN^H[\ÛY[ÈKO]Û\ÜÏHÛYH]Û\ÜÏHÛYKZ[\]Û\ÜÏH^YXÝÈXÚØYÙHX[YÙ[Y[Ù]Ü[Û\ÜÏHXØÙ[^OÜÜ[8 %HQÜÈ[\ÛY[ÛÛÚÛ\ÜÏHXYHPÚXØYÛÈQ\Ù\È^H[ÝXYÙÛÛHÜ\HX\Ù]XÙHÚÚ[ÛÝÜÈHYÚÛÛ[X[È[]\ËÜ]Û\ÜÏHÛËXÛÛ]]Û\ÜÏHÛÛ[X[Y[ÈXÚØYÙ\ÈÈ[Ý\ÝXÛÚÏÙ]]Û\ÜÏHÛÙHÜ[Û\ÜÏHÛHÛÙK[X[TRSSSTUTPÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÛHÈYHXÚØYÙHÈHY][[ÜÜ[ÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏH^OÜÜ[Ü[Û\ÜÏHYÜÜ[Ü[Û\ÜÏHÝ]ÚÝØ\X\^OÜÜ[ÜÜ[Ü[Û\ÜÏHÜÏÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÛHÈÜX]H[\ÛÛ]YÚXÝ[ÜÜ[ÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏH^OÜÜ[Ü[Û\ÜÏH[]ÜÜ[Ü[Û\ÜÏHÝ^KX[[\Ú\ÏÜÜ[ÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÙÜÜ[Ü[Û\ÜÏHÝ^KX[[\Ú\ÏÜÜ[ÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏH^OÜÜ[Ü[Û\ÜÏHYÜÜ[Ü[Û\ÜÏHÝÛÙXH\ÛÝ\ÝÜÜ[ÜÜ[Ü[Û\ÜÏHÜÏÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÛHÈ\ÙH^KZÙ\[È^ÜÙH]ÜÜ[ÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏHÛHÈ\ÈH\]\Ù\[ÜÜ[ÜÜ[Ü[Û\ÜÏHÜ[Û\ÜÏH^OÜÜ[Ü[Û\ÜÏHYÜÜ[Ü[Û\ÜÏHÝ^KZÙ\[ÜÜ[ÜÜ[Ù]Ù]]]Û\ÜÏH[\ÝÝ[OHX\Ú[]ÜÈ]Û\ÜÏHZ][HÜ[Û\ÜÏHXÛÈ¼'å$ÜÜ[]]Û\ÜÏH\ÛÛ]Y\\ÚXÝÙ]]Û\ÜÏHØÈXXÚ^HÚXÝ\È]ÈÝÛØÚÙ[K[Ý\[[\Ú\È[\ÛY[\È\ÙXÚXH[ÛÛÝXZÈÝ\\Ù\ËÙ]Ù]Ù]]Û\ÜÏHZ][HÜ[Û\ÜÏHXÛÈ¼'éêÜÜ[]]Û\ÜÏH[\ÜÛÛH[ÏÙ]]Û\ÜÏHØÈ^\Ý[ÈÛÛH[\ÛY[ÈØ[H[\ÜY[È^H8 %HÚÚ[Ø[Ø[È[ÝHÝYÚHZYÜ][ÛÙ]Ù]Ù]]Û\ÜÏHZ][HÜ[Û\ÜÏHXÛÈ¼'ê¤ÜÜ[]]Û\ÜÏH^KZÙ\[Ù]]Û\ÜÏHØÈXZÙ\È[H^H[\ÛY[\X\\ÈHÙ[XÝXH\]\Ù\[ÝÚ]ÚÙ\[ÈÚ]Ý]\Ý\[ÈHÙ\\Ù]Ù]Ù]Ù]]Û\ÜÏHØ\¸¦¨;î#ÈÛÝ\ÙHÛÙHÝ[OHÛ\Ú^NLÈ\[Ý[ØÛÙO\XÝH[HÝXÛÚÈÙ\[8 %]\\ÜÙ\ÈH[\ÛY[[Ø[XZÈ[ÜËÙ]Ù]Ù]Ù]Ù]KKHÓQHLÚ]È\ÚÈÛ]YHKO]Û\ÜÏHÛYH]Û\ÜÏHËYÛÝÈËYÛÝËLÙ]]Û\ÜÏHÛYKZ[\]Û\ÜÏH^YXÝÈÛ\[ÈHÚÚ[Ù]Ú]ÈÜ[Û\ÜÏHXØÙ[\ÚÈÛ]YOÜÜ[Ú]HX\Ù]XÙHØYYÚ]Û\ÜÏHØ\ÈÌ]Û\ÜÏHØ\Ü[Û\ÜÏHØ\ZXÛÛ¼'ä®ÏÜÜ[]Û\ÜÏHØ\]]HÛHÙÚ[Ù\\Ù]]Û\ÜÏHØ\Y\ØÈÜ]H[ÛÛÜÝXZ][HÜL[[\Ú\ÈØÈXY[ÈÛH	UKÛ^Y[\ËÈ^HÛÛÜØ\È[8 %[YHXYÈH\Ü[HÙÈÙ]\^H
+LHÓTÝÞHÜUTÈ]HXØÙ\ÜÈÚÝÈYHÝÈÈÚXÚÈ^H	UH][ÝHÙ]Ù]]Û\ÜÏHØ\Ü[Û\ÜÏHØ\ZXÛÛ¼'ê¤ÜÜ[]Û\ÜÏHØ\]]H[H\]\ÝXÛÚÏÙ]]Û\ÜÏHØ\Y\ØÈÜX]HHÛÙXHØÙ\ÜÛÜÈ\ÝÙÜ[H[XÝÛÛH^HÙ\XÙV]\Ù]ÝÈÈH[Ý[]ÚÝØ\X\^HÚ]^H[\ÈÝXÛÚÏÈÙ]\H\ÚÈÛ\Ý\Ü\ÝX]YÛÙXH[[\Ú\ÈÛHQ[YH]Y\H^H]\Ù]XHÙ\XÙV\Ú[È\ÛÝÜX]Ù]Ù]]Û\ÜÏHØ\Ü[Û\ÜÏHØ\ZXÛÛ¼'åá;î#ÏÜÜ[]Û\ÜÏHØ\]]H]HX[YÙ[Y[Ù]]Û\ÜÏHØ\Y\ØÈ[H]\Ù]XÌWÌLÜ
+U^[XÚ[È[\XØ]H]ÈPÚXØYÛÈÙ]\SÔÈXØÙ\ÜÈÛHHÙÚ[ÙHÜ^HÑT\Ù\[YHÚ]	ÜÈHYÚØ^HÈÝYÙH]HÛH	UHÈ	ÐÔUÒ[H]ÚØÈÙ]Ù]]Û\ÜÏHØ\Ü[Û\ÜÏHØ\ZXÛÛ¼'é%ÜÜ[]Û\ÜÏHØ\]]HS	[\[ÙOÙ]]Û\ÜÏHØ\Y\ØÈ[YH\ÞH^HÓ[Ù[ÈHQ]Û[\[ÙHÙ\\HØ[È[ÔHZ[[È[^H\]\X8 %ÝÈX[HLL[Ý[Ù\ÈÚÝ[H\]Y\ÝÈÙ]\H]ÛÛY[[^HÝXÛÚÈÈ]Y\HH[\[ÙH[Ú[Ù]Ù]Ù]Ù]Ù]KKHÓQHLÎ[[È\ÛÝ\Ù\ÈKO]Û\ÜÏHÛYH]Û\ÜÏHËYÛÝÈËYÛÝËLHÙ]]Û\ÜÏHÛYKZ[\Ý[OH^X[YÛÙ[\È]Û\ÜÏH^YXÝÈÝ[OH\ÝYKXÛÛ[Ù[\ÈX\Ú[[YÈ[ÝIÜHXYHÈÛÏÙ]HÝ[OHÛ\Ú^NLÈ[Ý[ÛÛXÝÜ[Û\ÜÏHXØÙ[\ÚÈÛ]YKÜÜ[ÚOÛ\ÜÏHXYÝ[OHX\Ú[]]ÎÈX^]ÚY
+È^X[YÛÙ[\ÈHX\Ù]XÙH\ÈÛ]YH[ÈHXÚ[]KX]Ø\HÛÛXÜ]ÜÚ]\[ÝIÜHÛHÙÚ[ÙHÜ[H\]\ÝXÛÚË]ÛÝÜÈHPÚXØYÛÈQÝXÚËÜ]Û\ÜÏHØ\ÈÌÈÝ[OHX\Ú[]ÜÈ^X[YÛYÈ]Û\ÜÏHØ\Ü[Û\ÜÏHØ\ZXÛÛ¼'äåÜÜ[]Û\ÜÏHØ\]]HQØÝ[Y[][ÛÙ]]Û\ÜÏHØ\Y\ØÈ\Ø]\ËÚ]X[ËØYYØÜÈ8 %ÛÛ\]HÝZY\ÈÜ[YHXÚ[]Y\ÈÚ]PÚXØYÛË\ÜXÚYXÈYÙ\ËÙ]Ù]]Û\ÜÏHØ\Ü[Û\ÜÏHØ\ZXÛÛ¼'å#ÜÜ[]Û\ÜÏHØ\]]HX\Ù]XÙH\ÏÙ]]Û\ÜÏHØ\Y\ØÈÚ]XÛÛKÝ\Ø]\ËÛX\Ù]XÙH8 %ÛÝ\ÙHÛÙK\ÜÝY\Ë[ÝÈÈÛÛX]H]ÈÚÚ[ÈÜXÚ[]Y\ËÙ]Ù]]Û\ÜÏHØ\Ü[Û\ÜÏHØ\ZXÛÛ¼'ä«ÜÜ[]Û\ÜÏHØ\]]HÙ][Ù]]Û\ÜÏHØ\Y\ØÈUTÈX]\[ÜÝØY]\Ù\ÈÚ[[ÜÜ[HÚ]X\ÜÝYHÛHX\Ù]XÙH\ÈÜÚÚ[\ÜXÚYXÈØ[\ËÙ]Ù]Ù]]Ý[OHX\Ú[]ÜÈÜ[Û\ÜÏHYÈÜYÚ[ÈX\Ù]XÙHY\Ø]\ËÛX\Ù]XÙOÜÜ[Ü[Û\ÜÏHYÈÜY[YXÚXØYÛËYOÜÜ[Ü[Û\ÜÏHYÈ[X\ÙÚ[YXÚXØYÛËYOÜÜ[Ù]Ù]Ù]Ù]KKH]YØ][ÛKO]Û\ÜÏH]]ÛÛ\ÜÏH]XÛÛXÚÏHÛÊLJH¸¡¤Ø]ÛÜ[Û\ÜÏH]XÝYHÛÝ[\HÈLÏÜÜ[]ÛÛ\ÜÏH]XÛÛXÚÏHÛÊJH¸¡¤Ø]ÛÙ]ØÜ\ÛÛÝÛY\ÈHØÝ[Y[]Y\TÙ[XÝÜ[
+	ËÛYIÊNÂÛÛÝÝ[HÛY\Ë[ÝÂ]Ý\HÂ[Ý[ÛÚÝÊHÂÛY\ÖØÝ\KÛ\ÜÓ\Ý[[ÝJ	ØXÝ]IÊNÂÝ\H
+
+ÈÝ[
+H	HÝ[ÂÛY\ÖØÝ\KÛ\ÜÓ\ÝY
+	ØXÝ]IÊNÂØÝ[Y[Ù][[Y[RY
+	ØÛÝ[\ÊK^ÛÛ[H	ØÝ\Ì_HÈ	ÝÝ[XÂØÝ[Y[Ù][[Y[RY
+	ÜÛY[[IÊK^ÛÛ[H	ØÝ\Ì_HÈ	ÝÝ[XÂØÝ[Y[Ù][[Y[RY
+	ÜÙÜ\ÜÉÊKÝ[KÚYH	Ê
+Ý\ÌJKÝÝ[
+JLIXÂB[Ý[ÛÛÊ
+HÈÚÝÊÝ\
+È
+NÈBØÝ[Y[Y][\Ý[\	ÚÙ^YÝÛËHOÂY
+ÉÐ\ÝÔYÚ	Ë	Ð\ÝÑÝÛË	È	×K[ÛY\ÊKÙ^JJHÈK][Y][
+
+NÈÛÊJNÈB[ÙHY
+ÉÐ\ÝÓY	Ë	Ð\ÝÕ\	×K[ÛY\ÊKÙ^JJHÈK][Y][
+
+NÈÛÊLJNÈB[ÙHY
+KÙ^HOOH	ÒÛYIÊHÚÝÊ
+NÂ[ÙHY
+KÙ^HOOH	Ñ[	ÊHÚÝÊÝ[LJNÂJNÂØÝ[Y[Ù][[Y[RY
+	ÜÙÜ\ÜÉÊKÝ[KÚYH	ÊKÝÝ[
+JLIXÂÜØÜ\ØÙOÚ[
